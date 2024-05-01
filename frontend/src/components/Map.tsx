@@ -41,7 +41,7 @@ const Mambox = () => {
           iconCreateFunction={createClusterCustomIcon}
         >
           {markers.map((marker) => (
-            <Marker position={marker.geocode} >
+            <Marker key={marker.popUp} position={marker.geocode} >
               <Popup>{marker.popUp}</Popup>
             </Marker>
           ))}
