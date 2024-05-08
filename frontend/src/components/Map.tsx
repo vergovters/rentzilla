@@ -1,31 +1,18 @@
 import "./Map.css";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { divIcon, point } from "leaflet";
+import { divIcon, DivIconOptions, LatLngTuple, point } from "leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { IPin } from "../models/IPin";
+import PinComp from "./PinComp";
+import { useMapEvents } from "react-leaflet";
 
 const url = import.meta.env.VITE_BACKEND
 
-const markers = [
-  {
-    geocode: [50.444, 30.521],
-    popUp: "Hello, I am pop up 1"
-  },
-  {
-    geocode: [50.443, 30.522],
-    popUp: "Hello, I am pop up 2"
-  },
-  {
-    geocode: [50.441, 30.52],
-    popUp: "Hello, I am pop up 3"
-  }
-];
-
 const Mambox = () => {
-  const position = [50.44, 30.52];
+  const position: LatLngTuple = [50.44, 30.52];
   const [pins, setPins] = useState([]);
 
   useEffect(() => {
@@ -40,16 +27,23 @@ const Mambox = () => {
     getPins();
   }, []);
 
-  console.log(pins);
-
-
   const createClusterCustomIcon = function (cluster: any) {
-    return new divIcon({
+    const iconOptions: DivIconOptions = {
       html: `<span class="cluster-icon">${cluster.getChildCount()}</span>`,
       className: "custom-marker-cluster",
       iconSize: point(33, 33, true)
-    });
   };
+
+  return new (divIcon as any)(iconOptions);
+  };
+  
+  const handleClick = (e: any) => {
+    console.log(e)
+  }
+
+  useMapEvents({
+    dblclick: handleClick 
+  });
 
   return (
     <MapContainer center={position} zoom={10}>
@@ -63,7 +57,9 @@ const Mambox = () => {
         >
           {pins.map((pin: IPin) => (
             <Marker key={pin._id} position={[pin.lat, pin.long]} >
-              <Popup>{pin.title}</Popup>
+              <Popup>
+                <PinComp {...pin}/>
+              </Popup>
             </Marker>
           ))}
         </MarkerClusterGroup>
